@@ -1,26 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="{{url_for('static', filename='css/main.css')}}">
-        <title> Error </title>
-    </head>
-    <body>
-        <main>
-            <div class="container">
-                <div class="background">
-                    <img src="/static/assets/404_error_background.jpg" alt="" id="error-background">
-                </div>
-                <div class="change-button">
-                    <img class="chevron-icon" src="/static/assets/chevron-left.png" alt="">
-                    <a href="{{ url_for('home')}}"> CHANGE CITY </a>
-                </div>
-                <h2 id="error-text"> This city does not exist. Please try again. </h2>
-                <div class="footer">
-                    <a href="https://github.com/Niharika1008"> © Niharika Chunchu </a>
-                </div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <title>Error</title>
+</head>
+<body>
+    <main>
+        <div class="container">
+            <div class="background">
+                <img src="{{ url_for('static', filename='assets/404_error_background.jpg') }}" alt="Error Background" id="error-background">
             </div>
-        </main>
-    </body>
+            <div class="change-button">
+                <img class="chevron-icon" src="{{ url_for('static', filename='assets/chevron-left.png') }}" alt="">
+                <a href="{{ url_for('home') }}"> CHANGE CITY </a>
+            </div>
+            <!-- 🔹 Dynamic error message -->
+            <h2 id="error-text"> {{ message }} </h2>
+            
+            <div class="footer">
+                <a href="https://github.com/Niharika1008"> © Niharika Chunchu </a>
+            </div>
+        </div>
+    </main>
+</body>
 </html>

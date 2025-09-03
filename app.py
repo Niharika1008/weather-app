@@ -4,28 +4,28 @@ import string
 from flask import Flask, render_template, request, redirect, url_for
 import os
 from dotenv import load_dotenv
-
-
 from pathlib import Path
+
+# Load environment variables
 env_path = Path(__file__).parent / ".env"
 load_dotenv(dotenv_path=env_path)
 
-print("DEBUG: Project root is", os.getcwd())   
+# Debugging prints (can remove later)
+print("DEBUG: Project root is", os.getcwd())
 print("DEBUG: API key from .env =", os.getenv("OWM_API_KEY"))
 
-
-
+# API endpoints
 OWM_ENDPOINT = "https://api.openweathermap.org/data/2.5/weather"
 OWM_FORECAST_ENDPOINT = "https://api.openweathermap.org/data/2.5/forecast"
 GEOCODING_API_ENDPOINT = "http://api.openweathermap.org/geo/1.0/direct"
+
+# Load API key
 api_key = os.getenv("OWM_API_KEY")
 
-#testing print("DEBUG: Loaded API Key ->", api_key)
-
+# Initialize Flask app
 app = Flask(__name__)
 
-
-
+# Home route
 @app.route("/", methods=["GET", "POST"])
 def home():
     if request.method == "POST":
@@ -33,16 +33,14 @@ def home():
         return redirect(url_for("get_weather", city=city))
     return render_template("index.html")
 
-
-# Display weather forecast for specific city using data from OpenWeather API
+# Weather route
 @app.route("/<city>", methods=["GET", "POST"])
 def get_weather(city):
-    # Format city name and get current date
     city_name = string.capwords(city.strip())
     today = datetime.datetime.now()
     current_date = today.strftime("%A, %B %d")
 
-    # Get latitude and longitude for city
+    # Get latitude/longitude
     location_params = {
         "q": city_name,
         "appid": api_key,
@@ -56,7 +54,6 @@ def get_weather(city):
 
     location_data = location_response.json()
 
-    # Handle case where city not found
     if not location_data or not isinstance(location_data, list):
         return render_template("error.html", message=f"City '{city_name}' not found.")
 
@@ -66,7 +63,7 @@ def get_weather(city):
     if not lat or not lon:
         return render_template("error.html", message=f"Could not find coordinates for '{city_name}'.")
 
-    # Get current weather data
+    # Current weather
     weather_params = {
         "lat": lat,
         "lon": lon,
@@ -83,7 +80,7 @@ def get_weather(city):
     max_temp = round(weather_data['main']['temp_max'])
     wind_speed = weather_data['wind']['speed']
 
-    # Get five-day forecast
+    # Forecast
     forecast_response = requests.get(OWM_FORECAST_ENDPOINT, weather_params)
     forecast_data = forecast_response.json()
 
@@ -119,13 +116,12 @@ def get_weather(city):
         five_day_dates_list=five_day_dates_list,
     )
 
-
-# Display error page for invalid input
+# Error route
 @app.route("/error")
 def error():
     message = request.args.get("message", "City not found or invalid input.")
     return render_template("error.html", message=message)
 
-
+# Run app (local only)
 if __name__ == "__main__":
     app.run(debug=True)
